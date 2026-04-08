@@ -97,3 +97,16 @@ class TestWeatherServiceGetWeather:
         await service.get_weather(city="Existente")
 
         assert len(region_repo._regions) == 1  # no new region created
+
+    async def test_result_includes_region_and_snapshot_ids(self) -> None:
+        client = FakeWeatherClient(condition=WeatherCondition.RAIN, city_name="CDMX")
+        service = WeatherService(
+            weather_client=client,
+            weather_repo=FakeWeatherRepository(),
+            region_repo=FakeRegionRepository(),
+        )
+
+        result = await service.get_weather(city="CDMX")
+
+        assert result.region_id is not None
+        assert result.snapshot_id is not None

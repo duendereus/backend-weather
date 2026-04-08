@@ -5,6 +5,7 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from typing import Any
 
 from app.domain.enums import WeatherCondition
 from app.domain.schemas.weather import WeatherData
@@ -141,8 +142,8 @@ class FakeWeatherRepository:
     def __init__(self) -> None:
         self._snapshots: list[FakeSnapshotRow] = []
 
-    async def save_snapshot(self, snapshot: FakeSnapshotRow) -> FakeSnapshotRow:
-        if not hasattr(snapshot, "id") or snapshot.id is None:
+    async def save_snapshot(self, snapshot: Any) -> Any:
+        if getattr(snapshot, "id", None) is None:
             snapshot.id = uuid.uuid4()
         self._snapshots.append(snapshot)
         return snapshot
@@ -153,6 +154,16 @@ class FakeWeatherRepository:
                 return snap
         return None
 
+    async def get_by_region(
+        self,
+        region_id: uuid.UUID,
+        *,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[FakeSnapshotRow]:
+        results = [s for s in self._snapshots if s.region_id == region_id]
+        return results[offset : offset + limit]
+
 
 class FakeInvestmentRepository:
     """In-memory evaluation store."""
@@ -160,8 +171,8 @@ class FakeInvestmentRepository:
     def __init__(self) -> None:
         self._evaluations: list[FakeEvaluationRow] = []
 
-    async def save_evaluation(self, evaluation: FakeEvaluationRow) -> FakeEvaluationRow:
-        if not hasattr(evaluation, "id") or evaluation.id is None:
+    async def save_evaluation(self, evaluation: Any) -> Any:
+        if getattr(evaluation, "id", None) is None:
             evaluation.id = uuid.uuid4()
         self._evaluations.append(evaluation)
         return evaluation
@@ -185,7 +196,12 @@ class FakeRegionRepository:
     def __init__(self, regions: list[FakeRegionRow] | None = None) -> None:
         self._regions: list[FakeRegionRow] = regions or []
 
-    async def create(self, region: FakeRegionRow) -> FakeRegionRow:
+    async def create(self, region: Any) -> Any:
+        # Assign an id if the object doesn't have one (e.g. ORM Region)
+        if getattr(region, "id", None) is None:
+            region.id = uuid.uuid4()
+        if getattr(region, "created_at", None) is None:
+            region.created_at = datetime.now(timezone.utc)
         self._regions.append(region)
         return region
 

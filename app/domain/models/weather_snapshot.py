@@ -5,7 +5,6 @@ from sqlalchemy import DateTime, Float, ForeignKey, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.domain.enums import WeatherCondition
 from app.domain.models import Base
 
 

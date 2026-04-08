@@ -1,7 +1,6 @@
 """Unit tests for repository classes — verify structure and contract without DB."""
 
 import inspect
-import uuid
 
 from app.repositories.config_repository import ConfigRepository
 from app.repositories.investment_repository import InvestmentRepository

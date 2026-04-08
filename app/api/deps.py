@@ -17,9 +17,8 @@ from app.services.weather_service import WeatherService
 
 
 async def get_session() -> AsyncIterator[AsyncSession]:
-    async with async_session_factory() as session:
-        async with session.begin():
-            yield session
+    async with async_session_factory() as session, session.begin():
+        yield session
 
 
 def get_weather_client() -> WeatherClient:

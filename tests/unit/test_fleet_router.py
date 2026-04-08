@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -41,7 +41,7 @@ class FakeInvestmentServiceForRouter:
             incentive_pct=35.0,
             incentive_amt=42.0,
             total_investment=162.0,
-            evaluated_at=datetime.now(timezone.utc),
+            evaluated_at=datetime.now(UTC),
         )
 
 

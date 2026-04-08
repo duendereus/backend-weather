@@ -44,6 +44,10 @@ line-length = 99
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "A", "SIM"]
+ignore = ["B008"]  # Depends() in defaults is the standard FastAPI pattern
+
+[tool.ruff.lint.per-file-ignores]
+"app/domain/models/__init__.py" = ["E402"]  # models must import after Base definition
 
 [tool.mypy]
 python_version = "3.12"
@@ -51,6 +55,12 @@ strict = true
 plugins = ["pydantic.mypy"]
 warn_return_any = true
 warn_unused_configs = true
+disallow_subclassing_any = false    # SQLAlchemy Base + Pydantic BaseSettings
+disallow_untyped_decorators = false  # FastAPI route/exception_handler decorators
+
+[[tool.mypy.overrides]]
+module = ["app.repositories.*"]
+warn_return_any = false  # SQLAlchemy scalar_one_or_none returns Any
 
 [tool.coverage.run]
 source = ["app"]

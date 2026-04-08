@@ -1,10 +1,13 @@
 import uuid
 
-import pytest
-
 from app.domain.enums import WeatherCondition
 from app.services.weather_service import WeatherService
-from tests.fakes import FakeRegionRepository, FakeRegionRow, FakeWeatherClient, FakeWeatherRepository
+from tests.fakes import (
+    FakeRegionRepository,
+    FakeRegionRow,
+    FakeWeatherClient,
+    FakeWeatherRepository,
+)
 
 
 class TestWeatherServiceGetWeather:
@@ -58,7 +61,7 @@ class TestWeatherServiceGetWeather:
             region_repo=region_repo,
         )
 
-        result = await service.get_weather(city="Bogota")
+        await service.get_weather(city="Bogota")
 
         assert len(weather_repo._snapshots) == 1
         snap = weather_repo._snapshots[0]

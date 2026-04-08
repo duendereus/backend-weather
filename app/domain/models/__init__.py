@@ -5,7 +5,7 @@ class Base(DeclarativeBase):
     pass
 
 
-# Register all models so Alembic can detect them
+# Register all models so Alembic can detect them — must come after Base definition
 from app.domain.models.incentive_config import IncentiveConfig as IncentiveConfig
 from app.domain.models.investment_evaluation import InvestmentEvaluation as InvestmentEvaluation
 from app.domain.models.region import Region as Region

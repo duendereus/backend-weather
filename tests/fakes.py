@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from app.domain.enums import WeatherCondition
 from app.domain.schemas.weather import WeatherData
 from app.infrastructure.weather_client.base import WeatherClient
-
 
 # ---------------------------------------------------------------------------
 # Weather Client fake
@@ -60,7 +59,7 @@ class FakeIncentiveConfigRow:
     condition: str
     base_fare: float
     incentive_pct: float
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     id: uuid.UUID = field(default_factory=uuid.uuid4)
 
 
@@ -72,7 +71,7 @@ class FakeSnapshotRow:
     description: str
     temperature_c: float
     wind_speed_ms: float
-    queried_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    queried_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -85,7 +84,7 @@ class FakeEvaluationRow:
     incentive_pct: float
     incentive_amt: float
     total_investment: float
-    evaluated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    evaluated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -94,7 +93,7 @@ class FakeRegionRow:
     name: str
     lat: float
     lon: float
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 # ---------------------------------------------------------------------------
@@ -201,7 +200,7 @@ class FakeRegionRepository:
         if getattr(region, "id", None) is None:
             region.id = uuid.uuid4()
         if getattr(region, "created_at", None) is None:
-            region.created_at = datetime.now(timezone.utc)
+            region.created_at = datetime.now(UTC)
         self._regions.append(region)
         return region
 

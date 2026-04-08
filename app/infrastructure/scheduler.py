@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
-from typing import TYPE_CHECKING
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -26,16 +24,15 @@ scheduler = AsyncIOScheduler()
 async def _run_snapshot_job() -> None:
     """Execute a single snapshot run with its own DB session."""
     logger.info("Snapshot job triggered")
-    async with async_session_factory() as session:
-        async with session.begin():
-            service = SnapshotService(
-                weather_client=OWMClient(),
-                weather_repo=WeatherRepository(session),
-                region_repo=RegionRepository(session),
-                config_repo=ConfigRepository(session),
-                investment_repo=InvestmentRepository(session),
-            )
-            await service.run()
+    async with async_session_factory() as session, session.begin():
+        service = SnapshotService(
+            weather_client=OWMClient(),
+            weather_repo=WeatherRepository(session),
+            region_repo=RegionRepository(session),
+            config_repo=ConfigRepository(session),
+            investment_repo=InvestmentRepository(session),
+        )
+        await service.run()
     logger.info("Snapshot job completed")
 
 

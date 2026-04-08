@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import uuid
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Protocol
 
 from app.core.exceptions import IncentiveConfigNotFoundError
@@ -88,7 +88,7 @@ class InvestmentService:
         incentive_amt = round(base_fare * incentive_pct / 100, 2)
         total_investment = round(base_fare + incentive_amt, 2)
         level = _CONDITION_LEVEL_MAP[condition]
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         # Persist
         from app.domain.models.investment_evaluation import InvestmentEvaluation

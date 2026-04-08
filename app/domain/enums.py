@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class WeatherCondition(str, Enum):
+class WeatherCondition(StrEnum):
     CLEAR = "CLEAR"
     CLOUDS = "CLOUDS"
     DRIZZLE = "DRIZZLE"
@@ -11,7 +11,7 @@ class WeatherCondition(str, Enum):
     EXTREME = "EXTREME"
 
 
-class InvestmentLevel(str, Enum):
+class InvestmentLevel(StrEnum):
     NONE = "NONE"
     LOW = "LOW"
     MEDIUM = "MEDIUM"

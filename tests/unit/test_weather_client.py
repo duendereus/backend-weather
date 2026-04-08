@@ -1,6 +1,8 @@
 import inspect
 from abc import ABC
 
+import pytest
+
 from app.domain.schemas.weather import WeatherData
 from app.infrastructure.weather_client.base import WeatherClient
 
@@ -13,19 +15,19 @@ class TestWeatherClientABC:
         assert hasattr(WeatherClient, "get_current_weather")
 
     def test_get_current_weather_is_async(self) -> None:
-        method = getattr(WeatherClient, "get_current_weather")
+        method = WeatherClient.get_current_weather
         assert inspect.iscoroutinefunction(method)
 
     def test_cannot_instantiate_directly(self) -> None:
-        try:
+        with pytest.raises(TypeError):
             WeatherClient()  # type: ignore[abstract]
-            assert False, "Should not be able to instantiate ABC"
-        except TypeError:
-            pass
 
 
 class TestWeatherData:
     def test_weather_data_schema_has_expected_fields(self) -> None:
         fields = set(WeatherData.model_fields.keys())
-        expected = {"condition", "description", "temperature_c", "wind_speed_ms", "city_name", "lat", "lon"}
+        expected = {
+            "condition", "description", "temperature_c",
+            "wind_speed_ms", "city_name", "lat", "lon",
+        }
         assert fields == expected

@@ -1,10 +1,13 @@
 import logging
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from app.api.v1.routers.config import router as config_router
+from app.api.v1.routers.fleet import router as fleet_router
+from app.api.v1.routers.regions import router as regions_router
 from app.core.config import settings
 from app.core.exceptions import (
     IncentiveConfigNotFoundError,
@@ -61,7 +64,7 @@ async def incentive_config_not_found_handler(
 
 
 # ---------------------------------------------------------------------------
-# Health check
+# Health check + Routers
 # ---------------------------------------------------------------------------
 
 
@@ -70,15 +73,6 @@ async def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-# ---------------------------------------------------------------------------
-# Routers
-# ---------------------------------------------------------------------------
-
-from app.api.v1.routers.config import router as config_router
-from app.api.v1.routers.fleet import router as fleet_router
-from app.api.v1.routers.regions import router as regions_router
-from app.core.config import settings as _settings
-
-app.include_router(fleet_router, prefix=_settings.API_V1_PREFIX)
-app.include_router(config_router, prefix=_settings.API_V1_PREFIX)
-app.include_router(regions_router, prefix=_settings.API_V1_PREFIX)
+app.include_router(fleet_router, prefix=settings.API_V1_PREFIX)
+app.include_router(config_router, prefix=settings.API_V1_PREFIX)
+app.include_router(regions_router, prefix=settings.API_V1_PREFIX)

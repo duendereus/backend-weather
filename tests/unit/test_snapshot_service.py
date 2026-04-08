@@ -1,8 +1,6 @@
 import uuid
 
-import pytest
-
-from app.domain.enums import InvestmentLevel, WeatherCondition
+from app.domain.enums import WeatherCondition
 from app.services.snapshot_service import SnapshotService
 from tests.fakes import (
     FakeConfigRepository,

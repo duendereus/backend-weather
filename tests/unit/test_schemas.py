@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -8,7 +8,6 @@ from app.domain.enums import InvestmentLevel, WeatherCondition
 from app.domain.schemas.config import IncentiveConfigResponse, IncentiveConfigUpdateRequest
 from app.domain.schemas.fleet import FleetEvaluateRequest, FleetEvaluateResponse
 from app.domain.schemas.regions import RegionCreateRequest, RegionResponse, SnapshotResponse
-
 
 # ---------------------------------------------------------------------------
 # FleetEvaluateRequest
@@ -65,7 +64,7 @@ class TestFleetEvaluateResponse:
             incentive_pct=35.0,
             incentive_amt=42.00,
             total_investment=162.00,
-            evaluated_at=datetime.now(timezone.utc),
+            evaluated_at=datetime.now(UTC),
         )
         assert resp.condition == WeatherCondition.RAIN
         assert resp.investment_level == InvestmentLevel.MEDIUM
@@ -101,7 +100,7 @@ class TestIncentiveConfigResponse:
             condition=WeatherCondition.RAIN,
             base_fare=120.0,
             incentive_pct=35.0,
-            updated_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(UTC),
         )
         assert resp.condition == WeatherCondition.RAIN
 
@@ -133,7 +132,7 @@ class TestRegionResponse:
             name="CDMX",
             lat=19.43,
             lon=-99.13,
-            created_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
         )
         assert resp.name == "CDMX"
 
@@ -152,6 +151,6 @@ class TestSnapshotResponse:
             description="light snow",
             temperature_c=-2.0,
             wind_speed_ms=5.1,
-            queried_at=datetime.now(timezone.utc),
+            queried_at=datetime.now(UTC),
         )
         assert resp.condition == WeatherCondition.SNOW

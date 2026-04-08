@@ -47,12 +47,15 @@ async function api(path, opts) {
     throw new Error('No se pudo conectar con el servidor. Verifica que el servicio este corriendo.');
   }
 
+  // 204 No Content (e.g. DELETE)
+  if (res.status === 204) return null;
+
   var data;
   try {
     data = await res.json();
   } catch (e) {
     if (!res.ok) throw new Error('Error del servidor (' + res.status + ' ' + res.statusText + ')');
-    return data;
+    return null;
   }
 
   if (!res.ok) {
@@ -317,7 +320,7 @@ document.getElementById('btn-refresh-history').addEventListener('click', loadHis
 async function loadRegions() {
   var tbody = document.getElementById('regions-body');
   var empty = document.getElementById('regions-empty');
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center"><span class="spinner"></span></td></tr>';
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center"><span class="spinner"></span></td></tr>';
   empty.style.display = 'none';
 
   try {
@@ -333,6 +336,7 @@ async function loadRegions() {
         '<td>' + r.lat + '</td>' +
         '<td>' + r.lon + '</td>' +
         '<td>' + formatDate(r.created_at) + '</td>' +
+        '<td><button class="btn-delete" data-id="' + r.id + '" data-name="' + escapeHtml(r.name) + '" onclick="deleteRegion(this)">Eliminar</button></td>' +
         '</tr>';
     }).join('');
   } catch (e) {
@@ -388,6 +392,28 @@ document.getElementById('btn-add-region').addEventListener('click', async functi
     btn.textContent = 'Agregar';
   }
 });
+
+async function deleteRegion(btnEl) {
+  var id = btnEl.dataset.id;
+  var name = btnEl.dataset.name;
+  if (!confirm('Eliminar la region "' + name + '"? Se eliminaran tambien sus snapshots y evaluaciones.')) {
+    return;
+  }
+  btnEl.disabled = true;
+  btnEl.textContent = 'Eliminando...';
+  try {
+    await api('/regions/' + id, { method: 'DELETE' });
+    toast('Region "' + name + '" eliminada');
+    loadRegions();
+    loadRegionDropdown();
+  } catch (e) {
+    toast(e.message, true);
+    btnEl.disabled = false;
+    btnEl.textContent = 'Eliminar';
+  }
+}
+
+window.deleteRegion = deleteRegion;
 
 /* =========================================================================
    CONFIG
@@ -465,6 +491,42 @@ async function saveConfig(btnEl) {
 }
 
 window.saveConfig = saveConfig;
+
+// Create new config
+document.getElementById('btn-add-config').addEventListener('click', async function () {
+  var condEl = document.getElementById('cfg-new-condition');
+  var fareEl = document.getElementById('cfg-new-fare');
+  var pctEl = document.getElementById('cfg-new-pct');
+
+  var condition = condEl.value;
+  var baseFare = Number(fareEl.value);
+  var pct = Number(pctEl.value);
+
+  if (!condition) { toast('Selecciona una condicion climatica', true); return; }
+  if (isNaN(baseFare) || baseFare <= 0) { toast('La tarifa base debe ser mayor a 0', true); return; }
+  if (isNaN(pct) || pct < 0 || pct > 100) { toast('El porcentaje debe estar entre 0 y 100', true); return; }
+
+  var btn = document.getElementById('btn-add-config');
+  btn.disabled = true;
+  btn.textContent = 'Agregando...';
+
+  try {
+    await api('/config/incentive', {
+      method: 'POST',
+      body: JSON.stringify({ condition: condition, base_fare: baseFare, incentive_pct: pct }),
+    });
+    toast('Configuracion de ' + condition + ' creada');
+    condEl.value = '';
+    fareEl.value = '120.00';
+    pctEl.value = '0';
+    loadConfig();
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Agregar';
+  }
+});
 
 /* =========================================================================
    UTILS

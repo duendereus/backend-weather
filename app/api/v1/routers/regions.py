@@ -51,6 +51,17 @@ async def create_region(
     )
 
 
+@router.delete("/{region_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_region(
+    region_id: uuid.UUID,
+    region_repo: RegionRepository = Depends(get_region_repo),
+) -> None:
+    region = await region_repo.get_by_id(region_id)
+    if region is None:
+        raise HTTPException(status_code=404, detail="Region not found")
+    await region_repo.delete(region)
+
+
 @router.get("/{region_id}/snapshots", response_model=list[SnapshotResponse])
 async def list_snapshots(
     region_id: uuid.UUID,

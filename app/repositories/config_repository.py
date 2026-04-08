@@ -21,6 +21,12 @@ class ConfigRepository:
         )
         return result.scalar_one_or_none()
 
+    async def create(self, config: IncentiveConfig) -> IncentiveConfig:
+        self._session.add(config)
+        await self._session.flush()
+        await self._session.refresh(config)
+        return config
+
     async def update_by_condition(
         self,
         condition: WeatherCondition,

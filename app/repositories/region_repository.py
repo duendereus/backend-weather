@@ -30,3 +30,7 @@ class RegionRepository:
             select(Region).order_by(Region.name)
         )
         return list(result.scalars().all())
+
+    async def delete(self, region: Region) -> None:
+        await self._session.delete(region)
+        await self._session.flush()

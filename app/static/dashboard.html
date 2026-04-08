@@ -183,6 +183,7 @@
                 <th>Latitud</th>
                 <th>Longitud</th>
                 <th>Creada</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="regions-body">
@@ -203,6 +204,33 @@
         <p style="color:var(--rappi-gray-400);font-size:14px;margin-bottom:20px">
           Edita la tarifa base y el porcentaje de incentivo para cada condicion climatica. Los cambios se aplican en tiempo real.
         </p>
+        <div class="form-row" style="margin-bottom:20px" id="config-create-form">
+          <div class="form-group">
+            <label for="cfg-new-condition">Condicion</label>
+            <select id="cfg-new-condition">
+              <option value="">-- Selecciona --</option>
+              <option value="CLEAR">CLEAR</option>
+              <option value="CLOUDS">CLOUDS</option>
+              <option value="DRIZZLE">DRIZZLE</option>
+              <option value="RAIN">RAIN</option>
+              <option value="THUNDERSTORM">THUNDERSTORM</option>
+              <option value="SNOW">SNOW</option>
+              <option value="EXTREME">EXTREME</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cfg-new-fare">Tarifa base ($)</label>
+            <input type="number" id="cfg-new-fare" step="0.01" min="0.01" value="120.00">
+          </div>
+          <div class="form-group">
+            <label for="cfg-new-pct">Incentivo (%)</label>
+            <input type="number" id="cfg-new-pct" step="0.1" min="0" max="100" value="0">
+          </div>
+          <div class="form-group" style="flex:0">
+            <label>&nbsp;</label>
+            <button class="btn btn-primary btn-sm" id="btn-add-config">Agregar</button>
+          </div>
+        </div>
         <div class="table-wrapper">
           <table>
             <thead>

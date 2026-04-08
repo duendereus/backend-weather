@@ -147,6 +147,28 @@ body {
   box-shadow: 0 4px 12px rgba(255, 68, 31, 0.3);
 }
 
+.btn-delete {
+  background: none;
+  border: 1px solid var(--rappi-gray-200);
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--rappi-gray-400);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-delete:hover {
+  border-color: var(--rappi-red);
+  color: var(--rappi-red);
+  background: #FEF2F2;
+}
+
+.btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-secondary {
   background: var(--rappi-gray-100);
   color: var(--rappi-gray-700);

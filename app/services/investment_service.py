@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 _CONDITION_LEVEL_MAP: dict[WeatherCondition, InvestmentLevel] = {
     WeatherCondition.CLEAR: InvestmentLevel.NONE,
-    WeatherCondition.CLOUDS: InvestmentLevel.NONE,
+    WeatherCondition.CLOUDS: InvestmentLevel.MINIMAL,
     WeatherCondition.DRIZZLE: InvestmentLevel.LOW,
     WeatherCondition.RAIN: InvestmentLevel.MEDIUM,
     WeatherCondition.THUNDERSTORM: InvestmentLevel.HIGH,

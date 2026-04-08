@@ -35,14 +35,14 @@ class TestInvestmentLevelMapping:
         )
         assert result.investment_level == InvestmentLevel.NONE
 
-    async def test_clouds_returns_none_level(self) -> None:
-        service = _make_service({WeatherCondition.CLOUDS: 0.0})
+    async def test_clouds_returns_minimal_level(self) -> None:
+        service = _make_service({WeatherCondition.CLOUDS: 5.0})
         result = await service.calculate(
             condition=WeatherCondition.CLOUDS,
             region_id=uuid.uuid4(),
             snapshot_id=uuid.uuid4(),
         )
-        assert result.investment_level == InvestmentLevel.NONE
+        assert result.investment_level == InvestmentLevel.MINIMAL
 
     async def test_drizzle_returns_low_level(self) -> None:
         service = _make_service({WeatherCondition.DRIZZLE: 15.0})

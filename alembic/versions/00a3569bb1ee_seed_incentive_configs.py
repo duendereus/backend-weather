@@ -21,7 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 # Default incentive configs from README
 SEED_DATA = [
     {"condition": "CLEAR",        "base_fare": 120.0, "incentive_pct": 0.0},
-    {"condition": "CLOUDS",       "base_fare": 120.0, "incentive_pct": 0.0},
+    {"condition": "CLOUDS",       "base_fare": 120.0, "incentive_pct": 5.0},
     {"condition": "DRIZZLE",      "base_fare": 120.0, "incentive_pct": 15.0},
     {"condition": "RAIN",         "base_fare": 120.0, "incentive_pct": 35.0},
     {"condition": "THUNDERSTORM", "base_fare": 120.0, "incentive_pct": 60.0},

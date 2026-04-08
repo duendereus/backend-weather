@@ -376,6 +376,7 @@ body {
 }
 
 .badge-NONE { background: var(--rappi-gray-200); color: var(--rappi-gray-700); }
+.badge-MINIMAL { background: #E0F2F1; color: #00695C; }
 .badge-LOW { background: #E8F5E9; color: #2E7D32; }
 .badge-MEDIUM { background: #FFF8E1; color: #F57F17; }
 .badge-HIGH { background: #FBE9E7; color: #D84315; }

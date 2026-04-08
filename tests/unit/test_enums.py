@@ -14,13 +14,14 @@ class TestWeatherCondition:
 
 class TestInvestmentLevel:
     def test_has_all_expected_levels(self) -> None:
-        expected = {"NONE", "LOW", "MEDIUM", "HIGH", "CRITICAL"}
+        expected = {"NONE", "MINIMAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"}
         actual = {level.value for level in InvestmentLevel}
         assert actual == expected
 
     def test_ordering_by_severity(self) -> None:
         ordered = [
             InvestmentLevel.NONE,
+            InvestmentLevel.MINIMAL,
             InvestmentLevel.LOW,
             InvestmentLevel.MEDIUM,
             InvestmentLevel.HIGH,

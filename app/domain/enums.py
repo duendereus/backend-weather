@@ -13,6 +13,7 @@ class WeatherCondition(StrEnum):
 
 class InvestmentLevel(StrEnum):
     NONE = "NONE"
+    MINIMAL = "MINIMAL"
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"

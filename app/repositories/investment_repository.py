@@ -21,6 +21,7 @@ class InvestmentRepository:
         self,
         *,
         region_id: uuid.UUID | None = None,
+        source: str | None = None,
         limit: int = 50,
         offset: int = 0,
     ) -> list[InvestmentEvaluation]:
@@ -31,6 +32,8 @@ class InvestmentRepository:
         )
         if region_id is not None:
             stmt = stmt.where(InvestmentEvaluation.region_id == region_id)
+        if source is not None:
+            stmt = stmt.where(InvestmentEvaluation.source == source)
         stmt = stmt.limit(limit).offset(offset)
         result = await self._session.execute(stmt)
         return list(result.scalars().all())

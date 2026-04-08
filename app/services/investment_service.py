@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import Any, Protocol
 
 from app.core.exceptions import IncentiveConfigNotFoundError
-from app.domain.enums import InvestmentLevel, WeatherCondition
+from app.domain.enums import EvaluationSource, InvestmentLevel, WeatherCondition
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +76,7 @@ class InvestmentService:
         condition: WeatherCondition,
         region_id: uuid.UUID,
         snapshot_id: uuid.UUID,
+        source: EvaluationSource = EvaluationSource.MANUAL,
     ) -> InvestmentResult:
         config = await self._config_repo.get_by_condition(condition)
         if config is None:
@@ -101,6 +102,7 @@ class InvestmentService:
             incentive_pct=incentive_pct,
             incentive_amt=incentive_amt,
             total_investment=total_investment,
+            source=source.value,
         )
         await self._investment_repo.save_evaluation(evaluation)
 

@@ -82,6 +82,10 @@ async def history(
         default=None,
         description="Filtrar por ID de region. Si no se envia, retorna todas.",
     ),
+    source: str | None = Query(
+        default=None,
+        description="Filtrar por origen: MANUAL o SCHEDULED.",
+    ),
     limit: int = Query(
         default=50,
         ge=1,
@@ -96,13 +100,14 @@ async def history(
     investment_repo: InvestmentRepository = Depends(get_investment_repo),
 ) -> list[dict]:  # type: ignore[type-arg]
     evaluations = await investment_repo.get_history(
-        region_id=region_id, limit=limit, offset=offset
+        region_id=region_id, source=source, limit=limit, offset=offset
     )
     return [
         {
             "id": str(e.id),
             "region_id": str(e.region_id),
             "region_name": e.region.name if e.region else "—",
+            "source": getattr(e, "source", "MANUAL"),
             "investment_level": e.investment_level,
             "base_fare": e.base_fare,
             "incentive_pct": e.incentive_pct,

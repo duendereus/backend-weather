@@ -112,6 +112,7 @@ document.querySelectorAll('.header-nav button').forEach(function (btn) {
     document.querySelectorAll('.section').forEach(function (s) { s.classList.remove('active'); });
     document.getElementById('section-' + section).classList.add('active');
     if (section === 'history') loadHistory();
+    if (section === 'scheduled') loadScheduled();
     if (section === 'regions') loadRegions();
     if (section === 'config') loadConfig();
     if (section === 'evaluate') loadRegionDropdown();
@@ -281,30 +282,51 @@ function renderResult(d) {
    HISTORY
    ========================================================================= */
 
+function renderEvaluationTable(data, tbodyId, emptyId) {
+  var tbody = document.getElementById(tbodyId);
+  var empty = document.getElementById(emptyId);
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = data.map(function (e) {
+    return '<tr>' +
+      '<td><strong>' + escapeHtml(e.region_name || '—') + '</strong></td>' +
+      '<td><span class="badge badge-' + e.investment_level + '">' + e.investment_level + '</span></td>' +
+      '<td>$' + Number(e.base_fare).toFixed(2) + '</td>' +
+      '<td>' + e.incentive_pct + '%</td>' +
+      '<td>$' + Number(e.incentive_amt).toFixed(2) + '</td>' +
+      '<td><strong>$' + Number(e.total_investment).toFixed(2) + '</strong></td>' +
+      '<td>' + formatDate(e.evaluated_at) + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
 async function loadHistory() {
   var tbody = document.getElementById('history-body');
   var empty = document.getElementById('history-empty');
   tbody.innerHTML = '<tr><td colspan="7" style="text-align:center"><span class="spinner"></span></td></tr>';
   empty.style.display = 'none';
-
   try {
-    var data = await api('/fleet/history?limit=50');
-    if (!data || data.length === 0) {
-      tbody.innerHTML = '';
-      empty.style.display = '';
-      return;
-    }
-    tbody.innerHTML = data.map(function (e) {
-      return '<tr>' +
-        '<td><strong>' + escapeHtml(e.region_name || '—') + '</strong></td>' +
-        '<td><span class="badge badge-' + e.investment_level + '">' + e.investment_level + '</span></td>' +
-        '<td>$' + Number(e.base_fare).toFixed(2) + '</td>' +
-        '<td>' + e.incentive_pct + '%</td>' +
-        '<td>$' + Number(e.incentive_amt).toFixed(2) + '</td>' +
-        '<td><strong>$' + Number(e.total_investment).toFixed(2) + '</strong></td>' +
-        '<td>' + formatDate(e.evaluated_at) + '</td>' +
-        '</tr>';
-    }).join('');
+    var data = await api('/fleet/history?source=MANUAL&limit=50');
+    renderEvaluationTable(data, 'history-body', 'history-empty');
+  } catch (e) {
+    toast(e.message, true);
+    tbody.innerHTML = '';
+    empty.style.display = '';
+  }
+}
+
+async function loadScheduled() {
+  var tbody = document.getElementById('scheduled-body');
+  var empty = document.getElementById('scheduled-empty');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center"><span class="spinner"></span></td></tr>';
+  empty.style.display = 'none';
+  try {
+    var data = await api('/fleet/history?source=SCHEDULED&limit=50');
+    renderEvaluationTable(data, 'scheduled-body', 'scheduled-empty');
   } catch (e) {
     toast(e.message, true);
     tbody.innerHTML = '';
@@ -313,6 +335,7 @@ async function loadHistory() {
 }
 
 document.getElementById('btn-refresh-history').addEventListener('click', loadHistory);
+document.getElementById('btn-refresh-scheduled').addEventListener('click', loadScheduled);
 
 /* =========================================================================
    REGIONS

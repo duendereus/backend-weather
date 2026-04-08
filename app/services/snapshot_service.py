@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Protocol
 
-from app.domain.enums import WeatherCondition
+from app.domain.enums import EvaluationSource, WeatherCondition
 from app.infrastructure.weather_client.base import WeatherClient
 from app.services.investment_service import InvestmentService
 
@@ -85,4 +85,5 @@ class SnapshotService:
             condition=data.condition,
             region_id=region.id,
             snapshot_id=snapshot_id,
+            source=EvaluationSource.SCHEDULED,
         )

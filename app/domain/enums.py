@@ -11,6 +11,11 @@ class WeatherCondition(StrEnum):
     EXTREME = "EXTREME"
 
 
+class EvaluationSource(StrEnum):
+    MANUAL = "MANUAL"
+    SCHEDULED = "SCHEDULED"
+
+
 class InvestmentLevel(StrEnum):
     NONE = "NONE"
     MINIMAL = "MINIMAL"

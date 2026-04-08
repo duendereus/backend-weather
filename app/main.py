@@ -33,11 +33,69 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("Shutting down Fleet Investment Service")
 
 
+API_DESCRIPTION = """
+## Fleet Investment Service
+
+Microservicio de **Rappi** que determina el nivel de inversion economica en flota
+de repartidores en funcion del clima de una region.
+
+### Como funciona
+
+1. Se consulta el clima actual de una ciudad o coordenadas via **OpenWeatherMap**.
+2. La condicion climatica (CLEAR, RAIN, THUNDERSTORM, etc.) se mapea a un **nivel de inversion**.
+3. Se aplica un **porcentaje de incentivo configurable** sobre una **tarifa base** para calcular
+   la inversion total que Rappi debe destinar a la flota de esa region.
+
+### Formula
+
+```
+incentivo = tarifa_base x (incentivo_pct / 100)
+inversion_total = tarifa_base + incentivo
+```
+
+### Niveles de inversion
+
+| Condicion climatica       | Nivel     | Incentivo por defecto |
+|---------------------------|-----------|-----------------------|
+| CLEAR                     | NONE      | 0%                    |
+| CLOUDS                    | MINIMAL   | 5%                    |
+| DRIZZLE                   | LOW       | 15%                   |
+| RAIN                      | MEDIUM    | 35%                   |
+| THUNDERSTORM / SNOW       | HIGH      | 60%                   |
+| EXTREME                   | CRITICAL  | 100%                  |
+
+### Modulos
+
+- **Fleet**: Evaluar inversion para una ubicacion y consultar historial.
+- **Config**: Gestionar los porcentajes de incentivo por condicion climatica.
+- **Regions**: Administrar las regiones geograficas monitoreadas.
+"""
+
 app = FastAPI(
     title="Fleet Investment Service",
-    description="Microservicio de Rappi para calcular inversión en flota según clima",
+    description=API_DESCRIPTION,
     version="0.1.0",
     lifespan=lifespan,
+    openapi_tags=[
+        {
+            "name": "fleet",
+            "description": "Evaluacion de inversion en flota segun clima. "
+            "Permite consultar el clima de una ciudad o coordenadas, "
+            "calcular el incentivo economico y consultar el historial de evaluaciones.",
+        },
+        {
+            "name": "config",
+            "description": "Configuracion de incentivos por condicion climatica. "
+            "Permite crear, consultar y actualizar la tarifa base y el porcentaje "
+            "de incentivo para cada tipo de clima (CLEAR, RAIN, SNOW, etc.).",
+        },
+        {
+            "name": "regions",
+            "description": "Gestion de regiones geograficas monitoreadas. "
+            "Las regiones registradas son consultadas periodicamente por el scheduler "
+            "para generar snapshots automaticos del clima.",
+        },
+    ],
 )
 
 

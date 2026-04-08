@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.deps import get_region_repo, get_weather_repo
 from app.domain.enums import WeatherCondition
@@ -12,7 +12,12 @@ from app.repositories.weather_repository import WeatherRepository
 router = APIRouter(prefix="/regions", tags=["regions"])
 
 
-@router.get("", response_model=list[RegionResponse])
+@router.get(
+    "",
+    response_model=list[RegionResponse],
+    summary="Listar regiones registradas",
+    description="Retorna todas las regiones geograficas registradas, ordenadas alfabeticamente.",
+)
 async def list_regions(
     region_repo: RegionRepository = Depends(get_region_repo),
 ) -> list[RegionResponse]:
@@ -29,7 +34,28 @@ async def list_regions(
     ]
 
 
-@router.post("", response_model=RegionResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=RegionResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Registrar una nueva region",
+    description="""
+Registra una region geografica para monitoreo climatico. El scheduler
+consultara el clima de esta region periodicamente y generara snapshots
+automaticos.
+
+**Importante:** el nombre debe coincidir con el que reconoce OpenWeatherMap
+(ej. `Mexico City` en lugar de `CDMX`). Si el nombre no es reconocido,
+las evaluaciones para esta region fallaran.
+
+Retorna **409 Conflict** si ya existe una region con el mismo nombre.
+""",
+    responses={
+        201: {"description": "Region creada exitosamente."},
+        409: {"description": "Ya existe una region con ese nombre."},
+        422: {"description": "Datos invalidos."},
+    },
+)
 async def create_region(
     body: RegionCreateRequest,
     region_repo: RegionRepository = Depends(get_region_repo),
@@ -51,7 +77,19 @@ async def create_region(
     )
 
 
-@router.delete("/{region_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{region_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Eliminar una region",
+    description="""
+Elimina una region y todos sus datos asociados (snapshots de clima
+y evaluaciones de inversion). Esta accion es irreversible.
+""",
+    responses={
+        204: {"description": "Region eliminada exitosamente."},
+        404: {"description": "Region no encontrada."},
+    },
+)
 async def delete_region(
     region_id: uuid.UUID,
     region_repo: RegionRepository = Depends(get_region_repo),
@@ -62,11 +100,32 @@ async def delete_region(
     await region_repo.delete(region)
 
 
-@router.get("/{region_id}/snapshots", response_model=list[SnapshotResponse])
+@router.get(
+    "/{region_id}/snapshots",
+    response_model=list[SnapshotResponse],
+    summary="Snapshots de clima de una region",
+    description="""
+Retorna los snapshots de clima capturados para una region, ordenados
+del mas reciente al mas antiguo. Los snapshots se generan automaticamente
+por el scheduler o cuando se realiza una evaluacion.
+
+Soporta paginacion con `limit` y `offset`.
+""",
+    responses={
+        200: {"description": "Lista de snapshots (puede estar vacia)."},
+        404: {"description": "Region no encontrada."},
+    },
+)
 async def list_snapshots(
     region_id: uuid.UUID,
-    limit: int = 50,
-    offset: int = 0,
+    limit: int = Query(
+        default=50, ge=1, le=200,
+        description="Cantidad maxima de resultados (1-200).",
+    ),
+    offset: int = Query(
+        default=0, ge=0,
+        description="Cantidad de resultados a saltar.",
+    ),
     region_repo: RegionRepository = Depends(get_region_repo),
     weather_repo: WeatherRepository = Depends(get_weather_repo),
 ) -> list[SnapshotResponse]:

@@ -51,10 +51,19 @@ class OWMClient(WeatherClient):
             async with httpx.AsyncClient(timeout=self._timeout) as client:
                 response = await client.get(f"{self._base_url}/weather", params=params)
                 response.raise_for_status()
-        except httpx.HTTPError as exc:
+        except httpx.HTTPStatusError as exc:
             logger.error("OWM request failed: %s", exc)
+            if exc.response.status_code == 401:
+                msg = "API key de OpenWeatherMap invalida o aun no activada (puede tardar hasta 2 horas)"
+            elif exc.response.status_code == 404:
+                msg = "Ciudad no encontrada en OpenWeatherMap"
+            else:
+                msg = f"OpenWeatherMap respondio con error {exc.response.status_code}"
+            raise WeatherServiceUnavailableError(msg) from exc
+        except httpx.HTTPError as exc:
+            logger.error("OWM network error: %s", exc)
             raise WeatherServiceUnavailableError(
-                f"Could not fetch weather data: {exc}"
+                "No se pudo conectar con OpenWeatherMap. Intenta de nuevo en unos minutos."
             ) from exc
 
         data = response.json()

@@ -44,26 +44,38 @@
           <div class="form-group">
             <label for="eval-mode">Buscar por</label>
             <select id="eval-mode">
-              <option value="city">Ciudad</option>
+              <option value="region">Region registrada</option>
+              <option value="city">Ciudad (busqueda libre)</option>
               <option value="coords">Coordenadas</option>
             </select>
           </div>
-          <div class="form-group" id="eval-city-group">
+          <div class="form-group" id="eval-region-group">
+            <label for="eval-region">Region</label>
+            <select id="eval-region">
+              <option value="">-- Selecciona una region --</option>
+            </select>
+          </div>
+          <div class="form-group" id="eval-city-group" style="display:none">
             <label for="eval-city">Ciudad</label>
-            <input type="text" id="eval-city" placeholder="ej. Guadalajara">
+            <input type="text" id="eval-city" placeholder="ej. Guadalajara" maxlength="255">
           </div>
           <div class="form-group" id="eval-lat-group" style="display:none">
             <label for="eval-lat">Latitud</label>
-            <input type="number" id="eval-lat" step="any" placeholder="20.66">
+            <input type="number" id="eval-lat" step="any" min="-90" max="90" placeholder="20.66">
+            <div class="field-error" id="eval-lat-error"></div>
           </div>
           <div class="form-group" id="eval-lon-group" style="display:none">
             <label for="eval-lon">Longitud</label>
-            <input type="number" id="eval-lon" step="any" placeholder="-103.35">
+            <input type="number" id="eval-lon" step="any" min="-180" max="180" placeholder="-103.35">
+            <div class="field-error" id="eval-lon-error"></div>
           </div>
           <div class="form-group" style="flex:0">
             <label>&nbsp;</label>
             <button class="btn btn-primary btn-sm" id="btn-evaluate">Evaluar</button>
           </div>
+        </div>
+        <div class="field-hint" id="eval-hint" style="margin-top:8px">
+          Administra las regiones disponibles desde <a href="#" id="link-to-regions" style="color:var(--rappi-orange);font-weight:600">Regiones</a>
         </div>
       </div>
 

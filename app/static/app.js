@@ -113,6 +113,7 @@ document.querySelectorAll('.header-nav button').forEach(function (btn) {
     document.getElementById('section-' + section).classList.add('active');
     if (section === 'history') loadHistory();
     if (section === 'scheduled') loadScheduled();
+    if (section === 'calculator') loadCalculatorDropdown();
     if (section === 'regions') loadRegions();
     if (section === 'config') loadConfig();
     if (section === 'evaluate') loadRegionDropdown();
@@ -277,6 +278,106 @@ function renderResult(d) {
   badge.textContent = d.investment_level;
   badge.className = 'badge badge-' + d.investment_level;
 }
+
+/* =========================================================================
+   CALCULATOR
+   ========================================================================= */
+
+// Store recent evaluations for the calculator dropdown
+var cachedEvaluations = [];
+
+async function loadCalculatorDropdown() {
+  var select = document.getElementById('calc-evaluation');
+  try {
+    var data = await api('/fleet/history?limit=30');
+    cachedEvaluations = data || [];
+    select.innerHTML = '<option value="">-- Selecciona una evaluacion --</option>';
+    if (cachedEvaluations.length === 0) {
+      select.innerHTML = '<option value="">-- Primero realiza una evaluacion en "Evaluar" --</option>';
+      return;
+    }
+    cachedEvaluations.forEach(function (e, i) {
+      var opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = e.region_name + ' — ' + e.investment_level +
+        ' (' + e.incentive_pct + '%) — ' + formatDate(e.evaluated_at);
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    // silent
+  }
+}
+
+// Show evaluation summary when selected
+document.getElementById('calc-evaluation').addEventListener('change', function () {
+  var idx = this.value;
+  var summary = document.getElementById('calc-eval-summary');
+  if (idx === '') {
+    summary.style.display = 'none';
+    document.getElementById('calc-result').style.display = 'none';
+    return;
+  }
+  var e = cachedEvaluations[Number(idx)];
+  summary.style.display = '';
+  document.getElementById('calc-region').textContent = e.region_name;
+  document.getElementById('calc-condition').textContent = e.investment_level;
+  document.getElementById('calc-condition').className = 'value condition-' + e.investment_level;
+  document.getElementById('calc-temp').textContent = e.incentive_pct + '%';
+  document.getElementById('calc-pct').textContent = e.incentive_pct + '%';
+  document.getElementById('calc-fare').textContent = '$' + Number(e.base_fare).toFixed(2);
+  var badge = document.getElementById('calc-badge');
+  badge.textContent = e.investment_level;
+  badge.className = 'badge badge-' + e.investment_level;
+  // Reset result
+  document.getElementById('calc-result').style.display = 'none';
+});
+
+document.getElementById('btn-calculate').addEventListener('click', function () {
+  var idx = document.getElementById('calc-evaluation').value;
+  if (idx === '') {
+    toast('Selecciona una evaluacion primero', true);
+    return;
+  }
+
+  var orders = parseInt(document.getElementById('calc-orders').value, 10);
+  var unitCost = parseFloat(document.getElementById('calc-cost').value);
+
+  if (isNaN(orders) || orders < 1) {
+    toast('Ingresa un numero de envios valido (minimo 1)', true);
+    return;
+  }
+  if (isNaN(unitCost) || unitCost <= 0) {
+    toast('Ingresa un costo por envio valido (mayor a 0)', true);
+    return;
+  }
+
+  var e = cachedEvaluations[Number(idx)];
+  var pct = e.incentive_pct;
+
+  var baseTotal = orders * unitCost;
+  var incremental = baseTotal * (pct / 100);
+  var grandTotal = baseTotal + incremental;
+  var unitTotal = unitCost * (1 + pct / 100);
+
+  document.getElementById('calc-result').style.display = '';
+  document.getElementById('calc-res-orders').textContent = orders.toLocaleString();
+  document.getElementById('calc-res-unit-cost').textContent = '$' + unitCost.toFixed(2);
+  document.getElementById('calc-res-unit-total').textContent = '$' + unitTotal.toFixed(2);
+  document.getElementById('calc-res-base-total').textContent = '$' + baseTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  document.getElementById('calc-res-incremental').textContent = '$' + incremental.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  document.getElementById('calc-res-grand-total').textContent = '$' + grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+  document.getElementById('calc-res-summary').innerHTML =
+    'Con <strong>' + orders.toLocaleString() + ' envios</strong> a <strong>$' + unitCost.toFixed(2) +
+    '</strong> cada uno en <strong>' + escapeHtml(e.region_name) + '</strong> (nivel ' + e.investment_level +
+    ', incentivo ' + pct + '%), el costo incremental por incentivos climaticos es de <strong>$' +
+    incremental.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) +
+    '</strong>, elevando el costo total de <strong>$' +
+    baseTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) +
+    '</strong> a <strong>$' +
+    grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) +
+    '</strong>.';
+});
 
 /* =========================================================================
    HISTORY

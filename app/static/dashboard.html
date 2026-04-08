@@ -14,6 +14,7 @@
       <span class="brand">Rappi</span>
       <nav class="header-nav">
         <button class="active" data-section="evaluate">Evaluar</button>
+        <button data-section="calculator">Calculadora</button>
         <button data-section="history">Historial</button>
         <button data-section="scheduled">Automaticas</button>
         <button data-section="regions">Regiones</button>
@@ -123,6 +124,96 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ==================== CALCULATOR ==================== -->
+    <div id="section-calculator" class="section">
+      <div class="card">
+        <div class="card-title">Calculadora de impacto financiero</div>
+        <p style="color:var(--rappi-gray-400);font-size:14px;margin-bottom:20px">
+          Selecciona una evaluacion climatica y agrega tus variables operativas
+          para proyectar el impacto economico total en la flota.
+        </p>
+
+        <div class="form-row" style="margin-bottom:20px">
+          <div class="form-group" style="flex:2">
+            <label for="calc-evaluation">Evaluacion base</label>
+            <select id="calc-evaluation">
+              <option value="">-- Primero realiza una evaluacion en "Evaluar" --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="calc-orders">Numero de envios</label>
+            <input type="number" id="calc-orders" min="1" step="1" placeholder="100">
+          </div>
+          <div class="form-group">
+            <label for="calc-cost">Costo promedio por envio ($)</label>
+            <input type="number" id="calc-cost" min="0.01" step="0.01" placeholder="120.00">
+          </div>
+          <div class="form-group" style="flex:0">
+            <label>&nbsp;</label>
+            <button class="btn btn-primary btn-sm" id="btn-calculate">Calcular</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected evaluation summary -->
+      <div id="calc-eval-summary" class="card" style="display:none">
+        <div class="card-title">
+          Condicion climatica: <span id="calc-region" style="color:var(--rappi-orange)"></span>
+          <span id="calc-badge" class="badge" style="margin-left:8px"></span>
+        </div>
+        <div class="result-grid" style="grid-template-columns: repeat(4, 1fr);">
+          <div class="result-item">
+            <div class="label">Condicion</div>
+            <div class="value" id="calc-condition" style="font-size:18px"></div>
+          </div>
+          <div class="result-item">
+            <div class="label">Temperatura</div>
+            <div class="value" id="calc-temp" style="font-size:18px"></div>
+          </div>
+          <div class="result-item">
+            <div class="label">Incentivo</div>
+            <div class="value" id="calc-pct" style="font-size:18px"></div>
+          </div>
+          <div class="result-item">
+            <div class="label">Tarifa base</div>
+            <div class="value" id="calc-fare" style="font-size:18px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial projection -->
+      <div id="calc-result" class="card" style="display:none">
+        <div class="card-title">Proyeccion financiera</div>
+        <div class="result-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="result-item">
+            <div class="label">Envios</div>
+            <div class="value" id="calc-res-orders"></div>
+          </div>
+          <div class="result-item">
+            <div class="label">Costo por envio</div>
+            <div class="value" id="calc-res-unit-cost" style="font-size:18px"></div>
+          </div>
+          <div class="result-item">
+            <div class="label">Costo por envio + incentivo</div>
+            <div class="value" id="calc-res-unit-total" style="font-size:18px"></div>
+          </div>
+          <div class="result-item">
+            <div class="label">Costo base total</div>
+            <div class="value" id="calc-res-base-total"></div>
+          </div>
+          <div class="result-item highlight">
+            <div class="label">Costo incremental (incentivos)</div>
+            <div class="value" id="calc-res-incremental"></div>
+          </div>
+          <div class="result-item highlight">
+            <div class="label">Costo total con incentivos</div>
+            <div class="value" id="calc-res-grand-total"></div>
+          </div>
+        </div>
+        <p id="calc-res-summary" style="margin-top:16px;color:var(--rappi-gray-700);font-size:14px;line-height:1.6"></p>
       </div>
     </div>
 

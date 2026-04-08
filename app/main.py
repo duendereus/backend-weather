@@ -1,9 +1,11 @@
 import logging
+import pathlib
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.routers.config import router as config_router
 from app.api.v1.routers.fleet import router as fleet_router
@@ -14,6 +16,8 @@ from app.core.exceptions import (
     RegionNotFoundError,
     WeatherServiceUnavailableError,
 )
+
+STATIC_DIR = pathlib.Path(__file__).resolve().parent / "static"
 
 logger = logging.getLogger(__name__)
 
@@ -76,3 +80,20 @@ async def health() -> dict[str, str]:
 app.include_router(fleet_router, prefix=settings.API_V1_PREFIX)
 app.include_router(config_router, prefix=settings.API_V1_PREFIX)
 app.include_router(regions_router, prefix=settings.API_V1_PREFIX)
+
+
+# ---------------------------------------------------------------------------
+# Static frontend (mock dashboard)
+# ---------------------------------------------------------------------------
+
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+
+@app.get("/", include_in_schema=False)
+async def serve_login() -> FileResponse:
+    return FileResponse(STATIC_DIR / "login.html")
+
+
+@app.get("/dashboard", include_in_schema=False)
+async def serve_dashboard() -> FileResponse:
+    return FileResponse(STATIC_DIR / "dashboard.html")

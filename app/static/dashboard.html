@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet Investment - Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-left">
+      <span class="brand">Rappi</span>
+      <nav class="header-nav">
+        <button class="active" data-section="evaluate">Evaluar</button>
+        <button data-section="history">Historial</button>
+        <button data-section="regions">Regiones</button>
+        <button data-section="config">Configuracion</button>
+      </nav>
+    </div>
+    <div class="header-right">
+      <div class="header-links">
+        <a href="/docs" target="_blank">API Docs</a>
+        &nbsp;&middot;&nbsp;
+        <a href="/redoc" target="_blank">ReDoc</a>
+      </div>
+      <div class="user-badge">
+        <div class="user-avatar" id="user-avatar">M</div>
+        <span id="user-name">martin</span>
+      </div>
+      <button class="btn-logout" id="btn-logout">Salir</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="app-main">
+
+    <!-- ==================== EVALUATE ==================== -->
+    <div id="section-evaluate" class="section active">
+      <div class="card">
+        <div class="card-title">Evaluar inversion en flota</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eval-mode">Buscar por</label>
+            <select id="eval-mode">
+              <option value="city">Ciudad</option>
+              <option value="coords">Coordenadas</option>
+            </select>
+          </div>
+          <div class="form-group" id="eval-city-group">
+            <label for="eval-city">Ciudad</label>
+            <input type="text" id="eval-city" placeholder="ej. Guadalajara">
+          </div>
+          <div class="form-group" id="eval-lat-group" style="display:none">
+            <label for="eval-lat">Latitud</label>
+            <input type="number" id="eval-lat" step="any" placeholder="20.66">
+          </div>
+          <div class="form-group" id="eval-lon-group" style="display:none">
+            <label for="eval-lon">Longitud</label>
+            <input type="number" id="eval-lon" step="any" placeholder="-103.35">
+          </div>
+          <div class="form-group" style="flex:0">
+            <label>&nbsp;</label>
+            <button class="btn btn-primary btn-sm" id="btn-evaluate">Evaluar</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="eval-result" style="display:none">
+        <div class="card">
+          <div class="card-title">
+            Resultado para <span id="res-region"></span>
+            <span id="res-badge" class="badge" style="margin-left:8px"></span>
+          </div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="label">Condicion</div>
+              <div class="value" id="res-condition"></div>
+            </div>
+            <div class="result-item">
+              <div class="label">Descripcion</div>
+              <div class="value" id="res-description" style="font-size:16px"></div>
+            </div>
+            <div class="result-item">
+              <div class="label">Temperatura</div>
+              <div class="value" id="res-temp"></div>
+            </div>
+            <div class="result-item">
+              <div class="label">Viento</div>
+              <div class="value" id="res-wind"></div>
+            </div>
+            <div class="result-item">
+              <div class="label">Tarifa base</div>
+              <div class="value" id="res-base"></div>
+            </div>
+            <div class="result-item">
+              <div class="label">Incentivo</div>
+              <div class="value" id="res-pct"></div>
+            </div>
+            <div class="result-item highlight">
+              <div class="label">Monto incentivo</div>
+              <div class="value" id="res-amt"></div>
+            </div>
+            <div class="result-item highlight">
+              <div class="label">Inversion total</div>
+              <div class="value" id="res-total"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== HISTORY ==================== -->
+    <div id="section-history" class="section">
+      <div class="card">
+        <div class="card-title">Historial de evaluaciones</div>
+        <div style="margin-bottom:16px">
+          <button class="btn btn-secondary btn-sm" id="btn-refresh-history">Actualizar</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Nivel</th>
+                <th>Tarifa base</th>
+                <th>Incentivo %</th>
+                <th>Monto</th>
+                <th>Total</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="history-body">
+            </tbody>
+          </table>
+        </div>
+        <div id="history-empty" class="empty-state" style="display:none">
+          <div class="icon">&#128202;</div>
+          <p>No hay evaluaciones aun. Realiza una evaluacion primero.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== REGIONS ==================== -->
+    <div id="section-regions" class="section">
+      <div class="card">
+        <div class="card-title">Regiones monitoreadas</div>
+        <div class="form-row" style="margin-bottom:20px">
+          <div class="form-group">
+            <label for="region-name">Nombre</label>
+            <input type="text" id="region-name" placeholder="ej. CDMX">
+          </div>
+          <div class="form-group">
+            <label for="region-lat">Latitud</label>
+            <input type="number" id="region-lat" step="any" placeholder="19.43">
+          </div>
+          <div class="form-group">
+            <label for="region-lon">Longitud</label>
+            <input type="number" id="region-lon" step="any" placeholder="-99.13">
+          </div>
+          <div class="form-group" style="flex:0">
+            <label>&nbsp;</label>
+            <button class="btn btn-primary btn-sm" id="btn-add-region">Agregar</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Latitud</th>
+                <th>Longitud</th>
+                <th>Creada</th>
+              </tr>
+            </thead>
+            <tbody id="regions-body">
+            </tbody>
+          </table>
+        </div>
+        <div id="regions-empty" class="empty-state" style="display:none">
+          <div class="icon">&#127758;</div>
+          <p>No hay regiones registradas.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CONFIG ==================== -->
+    <div id="section-config" class="section">
+      <div class="card">
+        <div class="card-title">Configuracion de incentivos</div>
+        <p style="color:var(--rappi-gray-400);font-size:14px;margin-bottom:20px">
+          Edita la tarifa base y el porcentaje de incentivo para cada condicion climatica. Los cambios se aplican en tiempo real.
+        </p>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Condicion</th>
+                <th>Tarifa base ($)</th>
+                <th>Incentivo (%)</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="config-body">
+            </tbody>
+          </table>
+        </div>
+        <div id="config-empty" class="empty-state" style="display:none">
+          <div class="icon">&#9881;</div>
+          <p>No hay configuracion de incentivos cargada. Ejecuta la migracion con seed data.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

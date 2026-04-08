@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: rappi
+      POSTGRES_PASSWORD: rappi
+      POSTGRES_DB: fleet_invest
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rappi -d fleet_invest"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://rappi:rappi@db:5432/fleet_invest"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  test:
+    build: .
+    profiles:
+      - test
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://rappi:rappi@db:5432/fleet_invest_test"
+      OWM_API_KEY: "fake-key-for-tests"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: pytest
+    volumes:
+      - .:/app
+
+volumes:
+  pgdata:

@@ -1,4 +1,5 @@
 import asyncio
+import ssl
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -15,6 +16,13 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
+
+
+def _build_connect_args() -> dict[str, object]:
+    """SSL connect args for asyncpg — mirrors database.py."""
+    if not settings.DATABASE_SSL:
+        return {}
+    return {"ssl": ssl.create_default_context()}
 
 
 def run_migrations_offline() -> None:
@@ -35,6 +43,7 @@ async def run_async_migrations() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args=_build_connect_args(),
     )
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)

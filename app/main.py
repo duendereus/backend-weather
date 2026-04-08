@@ -17,8 +17,12 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    from app.infrastructure.scheduler import start_scheduler, stop_scheduler
+
     logger.info("Starting Fleet Investment Service [%s]", settings.ENVIRONMENT)
+    start_scheduler()
     yield
+    stop_scheduler()
     logger.info("Shutting down Fleet Investment Service")
 
 

@@ -20,9 +20,8 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
     ENVIRONMENT: str = "development"
 
-    # Railway/Neon — Neon requires SSL; Railway provides PORT
+    # Neon requires SSL
     DATABASE_SSL: bool = False
-    PORT: int = 8000
 
 
 settings = Settings()

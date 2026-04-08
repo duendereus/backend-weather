@@ -2,6 +2,7 @@ import uuid
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.domain.models.investment_evaluation import InvestmentEvaluation
 
@@ -23,8 +24,10 @@ class InvestmentRepository:
         limit: int = 50,
         offset: int = 0,
     ) -> list[InvestmentEvaluation]:
-        stmt = select(InvestmentEvaluation).order_by(
-            InvestmentEvaluation.evaluated_at.desc()
+        stmt = (
+            select(InvestmentEvaluation)
+            .options(joinedload(InvestmentEvaluation.region))
+            .order_by(InvestmentEvaluation.evaluated_at.desc())
         )
         if region_id is not None:
             stmt = stmt.where(InvestmentEvaluation.region_id == region_id)

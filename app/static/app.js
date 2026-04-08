@@ -284,7 +284,7 @@ function renderResult(d) {
 async function loadHistory() {
   var tbody = document.getElementById('history-body');
   var empty = document.getElementById('history-empty');
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center"><span class="spinner"></span></td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center"><span class="spinner"></span></td></tr>';
   empty.style.display = 'none';
 
   try {
@@ -296,6 +296,7 @@ async function loadHistory() {
     }
     tbody.innerHTML = data.map(function (e) {
       return '<tr>' +
+        '<td><strong>' + escapeHtml(e.region_name || '—') + '</strong></td>' +
         '<td><span class="badge badge-' + e.investment_level + '">' + e.investment_level + '</span></td>' +
         '<td>$' + Number(e.base_fare).toFixed(2) + '</td>' +
         '<td>' + e.incentive_pct + '%</td>' +

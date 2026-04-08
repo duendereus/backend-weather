@@ -102,6 +102,7 @@ async def history(
         {
             "id": str(e.id),
             "region_id": str(e.region_id),
+            "region_name": e.region.name if e.region else "—",
             "investment_level": e.investment_level,
             "base_fare": e.base_fare,
             "incentive_pct": e.incentive_pct,
